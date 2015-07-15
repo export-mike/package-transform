@@ -4,51 +4,63 @@ var Argv = require('ee-argv');
 var Fs = require('fs');
 require('colors');
 
-var rootPackage = Fs.readFileSync('package.json', 'utf-8');
-var rootPackageObject = require('./package.json');
+var internals = {};
 
-var env = Argv.get('env').toUpperCase();
+module.exports = internals.packageTransform = function (options){
+	options = options || {};
 
-console.log('Starting Transform for %s'.bold.green, env);
+	var verbose = options.verbose || Argv.has('verbose');
+	var env = options.env || Argv.get('env').toUpperCase();
+	
+	var rootPackage = Fs.readFileSync('package.json', 'utf-8');
+	var rootPackageObject = require('./package.json');
 
-if(Argv.has('verbose')){
-	console.log('here is the rootPackage'.bold.yellow);
-	console.log(rootPackage);
-	console.log('end of rootPackage');
-}
+	console.log('Starting Transform for %s'.bold.green, env);
 
-var envPackage;
-try{
-	envPackage = require('./package.config.{ENV}.json'.replace('{ENV}',env));
-}catch(err){
-	console.log('Error Reading package.config.%s.json file. please check it exists'.bold.red, env);
-	if(Argv.has('verbose')){
-		console.log(err);
+	if(verbose){
+		console.log('here is the rootPackage'.bold.yellow);
+		console.log(rootPackage);
+		console.log('end of rootPackage'.bold.yellow);
 	}
-	process.exit(1);
-}
 
-for(var key in envPackage){
-	if(rootPackageObject.config[key]){
-		var replaceMe = '"'+key+'": "'+rootPackageObject.config[key]+'",';
-		var replaceMeWith = '"'+key+'": "'+envPackage[key]+'",';
-		
-		if(Argv.has('verbose')){
-			console.log('OLD : '.yellow + replaceMe);
-			console.log('NEW : '.green + replaceMeWith);
+	var envPackage;
+	try{
+		envPackage = require('./package.config.{ENV}.json'.replace('{ENV}',env));
+	}catch(err){
+		console.log('Error Reading package.config.%s.json file. please check it exists'.bold.red, env);
+		if(verbose){
+			console.log(err);
 		}
-		
-		rootPackage = rootPackage.replace(replaceMe, replaceMeWith);
+		process.exit(1);
 	}
-}
 
-try{
-	Fs.writeFileSync('package.json', rootPackage);
-	console.log('Completed Transform for %s'.bold.green, env);
-}catch(err){
-	console.log('Error Writing to package.json'.bold.red);
-	if(Argv.has('verbose')){
-		console.log(err);
+	for(var key in envPackage){
+		if(rootPackageObject.config[key]){
+			var replaceMe = '"'+key+'": "'+rootPackageObject.config[key]+'",';
+			var replaceMeWith = '"'+key+'": "'+envPackage[key]+'",';
+
+			if(verbose){
+				console.log('OLD : '.yellow + replaceMe);
+				console.log('NEW : '.green + replaceMeWith);
+			}
+
+			rootPackage = rootPackage.replace(replaceMe, replaceMeWith);
+		}
 	}
-	process.exit(1);
+
+	try{
+		Fs.writeFileSync('package.json', rootPackage);
+		console.log('Completed Transform for %s'.bold.green, env);
+	}catch(err){
+		console.log('Error Writing to package.json'.bold.red);
+		if(verbose){
+			console.log(err);
+		}
+		process.exit(1);
+	}
+
+};
+
+if(require.main === module) { 
+	internals.packageTransform();
 }

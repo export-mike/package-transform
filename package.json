@@ -1,6 +1,6 @@
 {
   "name": "package-transform",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "a simple tool that has reads your package.json file and replaces it with the contents of a package.config.{ENV}.json file local to package.json",
   "main": "index.js",
   "scripts": {
