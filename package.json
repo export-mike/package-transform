@@ -1,0 +1,26 @@
+{
+  "name": "package-transform",
+  "version": "1.0.0",
+  "description": "a simple tool that has reads your package.json file and replaces it with the contents of a package.config.{ENV}.json file local to package.json",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mikeljames/package-transform.git"
+  },
+  "keywords": [
+    "package.json",
+    "transform",
+    "environments",
+    "node.js",
+    "iojs"
+  ],
+  "author": "mjames <m@mikejam.es>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mikeljames/package-transform/issues"
+  },
+  "homepage": "https://github.com/mikeljames/package-transform"
+}
